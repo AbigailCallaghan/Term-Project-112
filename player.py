@@ -9,29 +9,38 @@ class Player:
         self.radius = 5
         self.dx = .1
         self.dy = .1
-        self.playerAngle = 0
+        self.turnDirection = 0 # 1 player is rotating to right, -1 rotating to left
+        self.walkDirection = 0
+        self.moveSpeed = 3
+        self.rotationSpeed = 2 * (math.pi/180)
+
+        self.playerAngle = 90 * (math.pi / 180)
 
     
     def drawPlayer(self, app):
         drawCircle(self.x, self.y, self.radius, fill = 'red')
         drawLine(self.x, self.y, self.x + math.cos(self.playerAngle) *10 , self.y + math.sin(self.playerAngle) * 10, fill = 'red')
+    
 
     def onKeyPress(self, app, key):
         if key == 'w':
-            self.x += self.dx
-            self.y += self.dy
+            self.walkDirection = 1
+           
         if key == 's':
-            self.x -= self.dx
-            self.y -= self.dy
+            self.walkDirection = -1
+           
         if key == 'a':
-            self.playerAngle -=.1
-            if self.playerAngle < 0:
-                self.playerAngle += 2 * math.pi
-            self.dx = math.cos(self.playerAngle) * 10
-            self.dy = math.sin(self.playerAngle) * 10
+            self.turnDirection = -1
+            
         if key == 'd':
-            self.playerAngle +=.1
-            if self.playerAngle > 0:
-                self.playerAngle -= 2 * math.pi
-            self.dx = math.cos(self.playerAngle) * 10
-            self.dy = math.sin(self.playerAngle) * 10
+            self.turnDirection = 1
+            
+        moveStep = self.walkDirection * self.moveSpeed
+        self.playerAngle += self.turnDirection * self.rotationSpeed
+        self.x += math.cos(self.playerAngle) * moveStep
+        self.y = math.sin(self.playerAngle) * moveStep
+    
+    def onKeyRelease(self, app):
+        self.turnDirection = 0
+        self.walkDirection = 0
+
