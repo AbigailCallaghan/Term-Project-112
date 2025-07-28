@@ -21,12 +21,16 @@ class Raycaster:
 
     def drawAllRays(self, app):
         count = 0
+        
         for ray in self.rays:
             ray.drawRays(app)
+            #slope = abs(count - app.rayAmount//10) + 1
+            #wallHeight = 15 * (slope/10)
 
-            lineHeight = (32 / ray.distance) * 415
-            startOfDrawing = (app.height / 2) - (lineHeight / 2)
-            endOfDrawing = lineHeight
-            drawRect(count*app.resilution, startOfDrawing, app.resilution, endOfDrawing, fill = 'lime')
+            #lineHeight = (wallHeight / ray.distance) * 415
+            #startOfDrawing = (app.height / 2) - (lineHeight / 2)
+            #endOfDrawing = lineHeight
+            #drawRect(count*app.resilution, startOfDrawing, app.resilution, endOfDrawing, fill = 'lime')
 
             count +=1
+        

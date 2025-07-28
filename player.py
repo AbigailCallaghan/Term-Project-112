@@ -1,10 +1,11 @@
 from cmu_graphics import * 
 import math
+from course import Course
 
 class Player:
 
-    def __init__(self):
-        self.x = 60
+    def __init__(self, course):
+        self.x = 50
         self.y = app.height - 60
         self.radius = 5
         self.dx = .1
@@ -14,7 +15,8 @@ class Player:
         self.moveSpeed = 3
         self.rotationSpeed = 5 * (math.pi/180)
         self.moving = False
-
+        self.course = Course()
+        print(self.course.wallInPosition(app, self.x, self.y))
         self.playerAngle = 90 * (math.pi / 180)
 
     
@@ -36,6 +38,13 @@ class Player:
         if key == 'd':
             self.turnDirection = 1
         self.moving = True
+        moveStep = self.walkDirection * self.moveSpeed
+        isWall = self.course.wallInPosition(app, self.x + math.cos(self.playerAngle) * moveStep, self.y + math.sin(self.playerAngle) * moveStep)
+        print(isWall)
+        self.playerAngle += self.turnDirection * self.rotationSpeed
+        if isWall == 0:
+            self.x += math.cos(self.playerAngle) * moveStep
+            self.y += math.sin(self.playerAngle) * moveStep
 
         
         
@@ -46,7 +55,6 @@ class Player:
         if self.moving == True:
             moveStep = self.walkDirection * self.moveSpeed
             self.playerAngle += self.turnDirection * self.rotationSpeed
-            print(self.playerAngle)
             self.x += math.cos(self.playerAngle) * moveStep
             self.y += math.sin(self.playerAngle) * moveStep
 

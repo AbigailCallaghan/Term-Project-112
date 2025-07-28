@@ -12,12 +12,7 @@ class Course:
                [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
-    
-    #def wallInPosition(self, app, x, y):
-   #     yCord = int(y //app.tileSize) -1
-     #   xCord = int(x // app.tileSize) -1
         
-     #   return self.map[yCord][xCord] == 1
     def wallInPosition(self, app, x, y):
         return self.map[int(y // app.tileSize)][int(x//app.tileSize)]
 

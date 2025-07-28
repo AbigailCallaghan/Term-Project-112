@@ -15,16 +15,18 @@ def onAppStart(app):
     app.height = app.rows *app.tileSize
     
     app.FOV = 60 * (math.pi / 180)
-    app.resilution = 10
+    app.resilution = 4
     app.rayAmount = app.width // app.resilution
     app.course = Course()
-    app.player = Player()
+    print((app.height - 60)// app.tileSize)
+    #app.course.testCords(app, 50, app.height - 60)
+    app.player = Player(app.course)
     app.raycaster = Raycaster(app.player, app.course)
     app.pY = app.height - 50
     app.lineLength = 30
     app.dx = 1
     app.dy = 1
-    app.stepsPerSecond = 5
+    app.stepsPerSecond = 30
 
 
 def redrawAll(app):
@@ -36,13 +38,14 @@ def redrawAll(app):
 
 
 def angleInUnitCircle(angle):
-    angle = angle % (2 *math.pi)
+    angle = angle % (2 * math.pi)
     if angle < 0:
         angle = (2 * math.pi) + angle
     return angle
 
 def onStep(app):
-    app.player.whileKeysPressed()
+    #app.player.whileKeysPressed()
+    pass
 
 def onKeyPress(app, key):
     app.player.onKeyPress(app,key)

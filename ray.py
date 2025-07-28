@@ -100,13 +100,13 @@ class Ray:
         verticalDistance = 0
         if horizontalWallFound:
             horizontalDistance = distance(self.player.x, self.player.y, horizontalHitX, horizontalHitY)
-        else:
-           horizontalDistance = 99999
+        #else:
+         #  horizontalDistance = 99999
 
         if verticalWallFound:
             verticalDistance = distance(self.player.x, self.player.y, verticalHitX, verticalHitY)
-        else:
-          verticalDistance = 99999
+       # else:
+        #  verticalDistance = 99999
         if horizontalDistance < verticalDistance:
             self.wallHitX = horizontalHitX
             self.wallHitY = horizontalHitY
