@@ -12,7 +12,7 @@ def onAppStart(app):
     app.rows = 10
     app.cols = 15
     app.width = app.cols * app.tileSize
-    app.height = app.rows *app.tileSizeg
+    app.height = app.rows *app.tileSize
     
     app.FOV = 60 * (math.pi / 180)
     app.resilution = 10

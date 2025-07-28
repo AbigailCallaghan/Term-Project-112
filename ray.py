@@ -13,14 +13,7 @@ def convertAngle(anlge):
 def distance(x0, y0, x1, y1):
     return ((x0-x1)**2 + (y0 -y1)**2) **.5
 
-def wallInPosition(app, x, y):
-        xPos = math.floor(x/app.tileSize)
-        yPos = math.floor(y/app.tileSize)
-        
-        if app.map[yPos][xPos] == 1: 
-            return True
-        else:
-            return False
+
 
 class Ray:
     def __init__(self, angle, player, course):
@@ -31,9 +24,9 @@ class Ray:
         self.facesUp = self.rayAngle < 0 and self.rayAngle > math.pi or not self.facesDown
         self.facesRight = self.rayAngle < (math.pi/2) or self.rayAngle > (3 * math.pi/2)
         self.facesLeft = self.rayAngle > (math.pi/2) or self.rayAngle < (3 * math.pi/2) or not self.facesRight
-        self.map = map
         self.wallHitX = 0
         self.wallHitY = 0
+        self.distance =0
 
     
 
@@ -48,7 +41,7 @@ class Ray:
         firstIntersectionInY = 0
 
         if self.facesUp: 
-            firstIntersectionInY = ((self.player.y) // app.tileSize) * (app.tileSize - 1)
+            firstIntersectionInY = (self.player.y // app.tileSize) * app.tileSize - 1
         elif self.facesDown:
             firstIntersectionInY = ((self.player.y // app.tileSize) * app.tileSize ) + app.tileSize
 
@@ -107,19 +100,23 @@ class Ray:
         verticalDistance = 0
         if horizontalWallFound:
             horizontalDistance = distance(self.player.x, self.player.y, horizontalHitX, horizontalHitY)
-        #else:
-         #   horizontalDistance = 99999
+        else:
+           horizontalDistance = 99999
 
         if verticalWallFound:
             verticalDistance = distance(self.player.x, self.player.y, verticalHitX, verticalHitY)
-       # else:
-          #  verticalDistance = 99999
+        else:
+          verticalDistance = 99999
         if horizontalDistance < verticalDistance:
             self.wallHitX = horizontalHitX
             self.wallHitY = horizontalHitY
+            self.distance = horizontalDistance
         else:
             self.wallHitX = verticalHitX
             self.wallHitY = verticalHitY
+            self.distance = verticalDistance
+
+        self.distance *= math.cos(self.player.playerAngle - self.rayAngle)
 
 
 

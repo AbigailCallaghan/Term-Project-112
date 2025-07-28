@@ -4,8 +4,8 @@ import math
 class Player:
 
     def __init__(self):
-        self.x = 52
-        self.y = app.height - 30
+        self.x = 60
+        self.y = app.height - 60
         self.radius = 5
         self.dx = .1
         self.dy = .1
