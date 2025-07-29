@@ -15,11 +15,11 @@ def onAppStart(app):
     app.height = app.rows *app.tileSize
     
     app.FOV = 60 * (math.pi / 180)
-    app.resilution = 4
+    app.resilution = 1
     app.rayAmount = app.width // app.resilution
     app.course = Course()
-    print((app.height - 60)// app.tileSize)
-    #app.course.testCords(app, 50, app.height - 60)
+   
+    #test
     app.player = Player(app.course)
     app.raycaster = Raycaster(app.player, app.course)
     app.pY = app.height - 50
@@ -31,11 +31,13 @@ def onAppStart(app):
 
 def redrawAll(app):
     drawRect(0, 0, app.width, app.height, fill = 'grey')
-    app.course.drawMap(app)
-    app.player.drawPlayer(app)
+  #  app.course.drawMap(app)
+  #  app.player.drawPlayer(app)
     app.raycaster.drawAllRays(app)
 
-
+def onStep(app):
+    app.player.move()
+    app.raycaster.castAllRays(app)
 
 def angleInUnitCircle(angle):
     angle = angle % (2 * math.pi)
@@ -43,9 +45,7 @@ def angleInUnitCircle(angle):
         angle = (2 * math.pi) + angle
     return angle
 
-def onStep(app):
-    #app.player.whileKeysPressed()
-    pass
+
 
 def onKeyPress(app, key):
     app.player.onKeyPress(app,key)
@@ -54,6 +54,10 @@ def onKeyPress(app, key):
 def onKeyRelease(app, key):
     app.player.onKeyRelease(key)
 
+def onMouseMove(app, mouseX, mouseY):
+   
+   app.player.onMouseMove(app, mouseX, mouseY)
+   app.raycaster.castAllRays(app)
 
 
 def wallInPosition(app, x, y):
