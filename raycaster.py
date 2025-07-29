@@ -29,12 +29,13 @@ class Raycaster:
             slope = 15
             wallHeight = 30
 
+            #for slopes need to apply based off of numrays
             lineHeight = (wallHeight / ray.distance) * 415
             startOfDrawing = (app.height / 2) - (lineHeight / 2)
             endOfDrawing = lineHeight
             print('end', endOfDrawing, 'start', startOfDrawing, count)
-            top = (abs(len(self.rays) - count)/ 100) * slope
-            drawRect(count*app.resilution, startOfDrawing - 2*slope, app.resilution, endOfDrawing +2*slope, fill = 'navy')
+            top = .1*count
+            drawRect(count*app.resilution, startOfDrawing - top, app.resilution, endOfDrawing +top, fill = 'navy')
 
             count +=1
         
