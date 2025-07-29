@@ -26,13 +26,15 @@ class Raycaster:
         
         for ray in self.rays:
             #ray.drawRays(app)
-            #slope = abs(count - app.rayAmount//100) + 1
-            wallHeight = 32
+            slope = 15
+            wallHeight = 30
 
             lineHeight = (wallHeight / ray.distance) * 415
             startOfDrawing = (app.height / 2) - (lineHeight / 2)
             endOfDrawing = lineHeight
-            drawRect(count*app.resilution, startOfDrawing, app.resilution, endOfDrawing, fill = 'navy')
+            print('end', endOfDrawing, 'start', startOfDrawing, count)
+            top = (abs(len(self.rays) - count)/ 100) * slope
+            drawRect(count*app.resilution, startOfDrawing - 2*slope, app.resilution, endOfDrawing +2*slope, fill = 'navy')
 
             count +=1
         

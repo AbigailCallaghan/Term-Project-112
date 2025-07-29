@@ -36,7 +36,7 @@ def redrawAll(app):
     app.raycaster.drawAllRays(app)
 
 def onStep(app):
-    app.player.move()
+    #app.player.move()
     app.raycaster.castAllRays(app)
 
 def angleInUnitCircle(angle):
@@ -55,9 +55,9 @@ def onKeyRelease(app, key):
     app.player.onKeyRelease(key)
 
 def onMouseMove(app, mouseX, mouseY):
-   
-   app.player.onMouseMove(app, mouseX, mouseY)
-   app.raycaster.castAllRays(app)
+    #app.player.onMouseMove(app, mouseX, mouseY)
+    #app.raycaster.castAllRays(app)
+    pass
 
 
 def wallInPosition(app, x, y):

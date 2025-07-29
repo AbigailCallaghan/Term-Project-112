@@ -14,7 +14,7 @@ class Player:
         self.walkDirection = 0
         self.velocity = 1
         self.inputForce = 0
-        self.rotationSpeed = 1 * (math.pi/180)
+        self.rotationSpeed = 45 * (math.pi/180)
         self.moving = False
         self.course = Course()
         self.playerAngle = 45 * (math.pi / 180) + 180
@@ -27,6 +27,7 @@ class Player:
     
 
     def onKeyPress(self, app, key):
+        print(key, self.velocity)
         if key == 'w':
             self.walkDirection = 1
            
@@ -39,42 +40,42 @@ class Player:
         if key == 'd':
             self.turnDirection = 1
         if key == 'space':
-            print('called')
-            self.inputForce += 20
+            self.inputForce += 400
+        self.move(app)
     
-    def buggyForces(self):
-        if self.velocity > 0:
-            normal = 9.8 * 150
-            friction = normal * .7
+    def buggyForces(self, app):
+        if self.velocity >= 0:
+            normal = 9.8 * 68
+            friction = normal * .05
             drag = (self.velocity ** 2) * .5 * 1.225 * 76.505653 * .47
-            total = self.inputForce - friction - drag
-            acceleration = total / 150
-            print(acceleration)
-            self.velocity += acceleration
+            self.inputForce = (self.inputForce - friction - drag) if self.inputForce >= 0 else 0
+            acceleration = self.inputForce / 68
+            self.velocity += acceleration * (1/app.stepsPerSecond)
         else:
-            self.velocity = 1
+            self.velocity = 0
        
     
-    def move(self):
-        self.buggyForces()
+    def move(self, app):
+        self.buggyForces(app)
         isWall = self.course.wallInPosition(app, self.x + math.cos(self.playerAngle) * self.velocity, self.y + math.sin(self.playerAngle) * self.velocity)
         self.playerAngle += self.turnDirection * self.rotationSpeed
-        if self.playerAngle > 180:
-            self.playerAngle = 0
+       # if self.playerAngle > 180:
+       #     self.playerAngle = 0
         if isWall == 0:
             self.x += math.cos(self.playerAngle) * self.velocity
             self.y += math.sin(self.playerAngle) * self.velocity
 
 
     def onMouseMove(self, app, mouseX, mouseY):
-        if mouseX >= app.width // 2:
-            self.turnDirection += .1
-        if mouseX < app.width // 2:
-            self.turnDirection += -.1
+       # print(self.playerAngle, 'angle')
+        #if mouseX >= app.width // 2:
+         #   self.turnDirection += .01
+        #if mouseX < app.width // 2:
+        #    self.turnDirection += -.01
         if self.playerAngle > 360:
             self.playerAngle = 0
        
-        self.move()
+        self.move(app)
 
 
 
