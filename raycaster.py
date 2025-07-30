@@ -26,7 +26,7 @@ class Raycaster:
         
         for ray in self.rays:
             slope = 15
-            wallHeight = 64
+            wallHeight = 100
             url = 'https://piskel-imgstore-b.appspot.com/img/c6646700-6c9b-11f0-b29a-6f0689713f11.gif'
 
             #for slopes need to apply based off of numrays

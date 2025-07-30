@@ -86,10 +86,9 @@ class Course:
 
         #this is for curved up
         if mapOneCols < mapTwoCols:
-            print('this is fine')
             difference = mapTwoCols - mapOneCols
-            if directionOne == 'straight':
-                difference += 1
+           # if directionOne == 'straight':
+            #    difference += 1
             
             beforeRow = colMapTwoWhiteSpace - colMapOneWhiteSpace
             afterRow = difference - beforeRow
@@ -98,8 +97,8 @@ class Course:
                     mapOne[row].append(1)
         elif mapTwoCols < mapOneCols:
             difference = mapOneCols - mapTwoCols
-            if directionOne == 'straight':
-                difference += 1
+           # if directionOne == 'straight':
+            #    difference += 1
             beforeRow = colMapOneWhiteSpace - colMapTwoWhiteSpace
             afterRow = difference - beforeRow
             for row in range(len(mapTwo)):
@@ -125,6 +124,7 @@ class Course:
             
             self.map.append(newRow)
         
+        
     def wallInPosition(self, app, x, y):
         newX = int(x//app.tileSize)
         newY = int(y//app.tileSize)
@@ -139,7 +139,4 @@ class Course:
                 else:
                     drawRect(col * app.tileSize, row * app.tileSize, app.tileSize -1, app.tileSize -1, fill = 'white')
 
-test = Course()
-test2 = Course()
-test.map = test.createMap(10, 5, 'straight')
 

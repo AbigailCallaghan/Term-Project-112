@@ -34,8 +34,8 @@ class Player:
             
         if key == 'd':
             self.turnDirection = 1
-        if key == 'space':
-            self.inputForce += 100
+        if key == 'space' and app.pushZone == True:
+            self.inputForce = 100
         
         self.move(app)
         
@@ -43,13 +43,17 @@ class Player:
     def buggyForces(self, app):
         if self.velocity >= 0:
             slope = app.potentialMaps[app.mapKey][3]
-            weight = 9.8 * 68 * math.cos(slope)
+            slope = math.radians(slope)
+            weight = 9.8 * 68 * math.sin(slope)
             normal = 9.8 * 68
             friction = normal * .05
-            drag = (self.velocity ** 2) * .5 * 1.225 * 76.505653 * .47
+            drag = (self.velocity ** 2) * .5 * 1.225 * 2 * .47
             repellingForces = (friction + drag + weight) / (app.stepsPerSecond)
-            self.inputForce = (self.inputForce - repellingForces) if (self.inputForce - repellingForces)>= 0 else -(repellingForces)
-            acceleration = self.inputForce / 68
+            total = -repellingForces
+            if self.inputForce != 0:
+                total = self.inputForce - repellingForces
+                self.inputForce *= .6
+            acceleration = total / 68
             self.velocity += acceleration
         else:
             self.velocity = 0  
