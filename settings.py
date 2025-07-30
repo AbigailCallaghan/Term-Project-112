@@ -1,5 +1,5 @@
 from cmu_graphics import * 
-import math
+import math, random
 from player import Player
 from raycaster import Raycaster
 from course import Course
@@ -8,7 +8,16 @@ from course import Course
 #it's in pygame so i'm translating it to cmu graphics
 # i will be rewriting most of the code, I am just getting the basics so the code right now follows the tutorial pretty closely
 def onAppStart(app):
-    app.tileSize = 32
+    app.potentialMaps = {0: ['straight', 9, 5, 5], 1:['curved up', 5, 9, -3]}
+    # easy is more downhill and has wider areas
+    #hard has increased speed
+    app.difficultyLevels = {'easy': {'length range': (4, 9), 'width range': (4, 8), 'slope range': (-20, 5)},
+                            'medium': {'length range': (2, 9), 'width range': (2, 6), 'slope range': (-15, 15)},
+                            'hard': {'length range': (1, 9), 'width range': (1, 4), 'slope range': (-30, 30)},
+                            'chaos':{'length range': (1, 9), 'width range': (1, 9), 'slope range': (-45, 45)}}
+    app.playerChars = [50, .05, 500]
+    app.difficultyKey = 'easy'
+    app.tileSize = 50
     app.course = Course()
     app.mapKey = 0
     app.nextBottom =0
@@ -25,20 +34,28 @@ def onAppStart(app):
     app.raycaster = Raycaster(app.player, app.course)
     app.pY = app.height - 50
     app.lineLength = 30
-    app.drawMap = True
+    app.intro = False
+    app.drawMap  = False
     app.manual = False
+    app.loadingScreen = True
+    app.mainLabelKey = 0
     app.stepsPerSecond = 30
 
-
 def redrawAll(app):
-    drawRect(0, 0, app.width, app.height, fill = 'black')
-    if app.drawMap == True:
-        app.course.drawMap(app)
-        app.player.drawPlayer(app)
-        app.raycaster.drawAllRays(app)
+    if app.loadingScreen:
+        if app.intro == True: drawIntroAnimation(app)
+        else: 
+            drawLoadingScreen(app, app.mainLabelKey)
     else:
-        app.raycaster.drawAllRays(app)
-        drawSteeringWheel(app)
+        drawRect(0, 0, app.width, app.height, fill = 'black')
+        if app.drawMap == True:
+            app.course.drawMap(app)
+            app.player.drawPlayer(app)
+            app.raycaster.drawAllRays(app)
+        else:
+            app.raycaster.drawAllRays(app)
+            drawSideBar(app)
+            drawSteeringWheel(app)
 
 def steeringWheelDimensions(app):
     distanceFromSides = app.width/6
@@ -46,6 +63,23 @@ def steeringWheelDimensions(app):
     distanceFromGround = app.height - app.steeringWheelHeight
     app.steeringWheelLeftCordinates = (distanceFromSides, distanceFromGround + 10)
     app.steeringWheelRightCordinates = (app.width - distanceFromSides, distanceFromGround + 10)
+
+def drawSideBar(app):
+    fontColor = 'chartreuse'
+    labelLeft = 20
+    drawRect(labelLeft -10, 10, 250, 110, fill = 'dimGray', border = fontColor)
+    drawLabel('Player status', 135, 20, font = 'Tekno', fill = fontColor, size = 16, bold = True)
+    trueVelocity = app.player.velocity if app.player.velocity >=0 else 0
+    velocity = rounded(trueVelocity)
+    drawLabel(f'Velocity: {velocity} m/s', labelLeft, 40, font = 'Tekno', fill = fontColor, align = 'left')
+    sectionType = app.potentialMaps[app.mapKey][0]
+    slope = True
+    nextSectionType = app.potentialMaps[app.mapKey][0]
+    nextSlope = False
+    drawLabel(f'Current section {sectionType} with slope {slope}', labelLeft, 60, font = 'Tekno', fill = fontColor, align = 'left')
+    drawLabel(f'Next section {nextSectionType} with slope {nextSlope}', labelLeft, 80, font = 'Tekno', fill = fontColor, align = 'left')
+    drawLabel(f'Total distance: {app.player.totalDistance}m', labelLeft, 100, font = 'Tekno', fill = fontColor, align = 'left')
+    
 
 def drawSteeringWheel(app):
     steeringWheelColor = 'darkSlateGray'
@@ -73,31 +107,127 @@ def onKeyPress(app, key):
     app.raycaster.castAllRays(app)
 
 
-
 def onMousePress(app, mouseX, mouseY):
+    if app.loadingScreen == True:
+        loadingScreenButtonPress(app, app.mainLabelKey, mouseX, mouseY)
     if app.manual == False:
         app.player.onMousePress(app, mouseX, mouseY)
 
 def createMap(app):
-    potentialMaps = {2: ['straight', 10, 6], 1: ['curved up', 8, 5], 0: ['straight', 10, 5]}
-    if app.mapKey + 1 < len(potentialMaps):
-        mapOneDirection = potentialMaps[app.mapKey][0]
-        mapTwoDirection = potentialMaps[app.mapKey + 1][0]
-        mapOneLength = potentialMaps[app.mapKey][1]
-        mapTwoLength = potentialMaps[app.mapKey + 1][1]
-        mapOneWidth = potentialMaps[app.mapKey][2]
-        mapTwoWidth = potentialMaps[app.mapKey + 1][2]
+    nextPartial = generatePartialMap(app)
+    app.potentialMaps[app.mapKey + 2] = nextPartial
+    print(nextPartial, app.potentialMaps, app.potentialMaps[2][3])
+    if app.mapKey + 1 < len(app.potentialMaps):
+        mapOneDirection = app.potentialMaps[app.mapKey][0]
+        mapTwoDirection = app.potentialMaps[app.mapKey + 1][0]
+        mapOneLength = app.potentialMaps[app.mapKey][1]
+        mapTwoLength = app.potentialMaps[app.mapKey + 1][1]
+        mapOneWidth = app.potentialMaps[app.mapKey][2]
+        mapTwoWidth = app.potentialMaps[app.mapKey + 1][2]
         app.nextBottom = mapOneLength + 1
         app.course.combineMaps(app, mapOneDirection, mapOneLength, mapOneWidth, mapTwoDirection, mapTwoLength, mapTwoWidth)
         #need to reset player position for y, x is fine
-        app.player.y, placeHolder =  app.course.findClosestWhiteSpace(app, 'down')
+        placeHolderX = app.player.x
+        app.player.y, app.player.x =  app.course.findClosestWhiteSpace(app, 'down')
+        if app.course.map[int(app.player.y//app.tileSize)][int(placeHolderX//app.tileSize)] == 0:
+            app.player.x = placeHolderX
+        
 
+def generatePartialMap(app):
+    nextDirection = 'curved up' if app.mapKey % 2 == 1 else 'straight'
+    difficultyLevels = app.difficultyLevels[app.difficultyKey]
+    lengthRange = difficultyLevels['length range']
+    widthRange = difficultyLevels['width range']
+    slopeRange = difficultyLevels['slope range']
+    lengthLo, lengthHi = lengthRange[0], lengthRange[1]
+    widthLo, widthHi = widthRange[0], widthRange[1]
+    slopeLo, slopeHi = slopeRange[0], slopeRange[1]
+    nextLength = random.randint(lengthLo, lengthHi)
+    nextWidth = random.randint(widthLo, widthHi)
+    slope = random.randint(slopeLo, slopeHi)
+    return [nextDirection, nextLength, nextWidth, slope]
 
 def switchMaps(app):
     trueYCoord = int(app.player.y//app.tileSize)
-    if trueYCoord == (app.rows- (app.nextBottom + 1)):
+    if trueYCoord == (app.rows - (app.nextBottom +1)):
         app.mapKey +=1
         createMap(app)
+
+def drawIntroAnimation(app):
+    pass
+
+def drawLoadingScreen(app, mainLabelKey):
+    #gradient = gradient('black', rgb(0, 0, 25), 'midnightBlue', 'darkSlateGray', 'dimGray', start='top')
+    drawRect(0, 0, app.width, app.height, 
+             fill =  gradient('black', rgb(0, 0, 25), 'midnightBlue', 'darkSlateGray', 'dimGray', start='top'))
+    drawLabel('Loading Screen', app.width/2, 75, size = 50, bold = True, fill = 'white')
+    mainLabel = {0: 'Choose your difficulty', 1: 'Choose your characteristics'}
+    drawLabel(mainLabel[mainLabelKey], app.width/2, 150, size = 25, bold = True, fill = 'white')
+    drawLoadingScreenOption(app, app.mainLabelKey)
+
+def drawLoadingScreenOption(app, mainLabelKey):
+    backGroundColor =  rgb(0, 0, 25)
+    if mainLabelKey == 0:
+        section = (app.width - 60)//4
+        potentialLabels = ['Easy', 'Medium', 'Hard', 'Chaos']
+        potentialUrls = ['https://streak.club/img/Mix1c2VyX2NvbnRlbnQvdXBsb2Fkcy9pbWFnZS8zMjYxOC5wbmc=/original/cMTlu6.png']
+        #black hole image: https://streak.club/p/29287/black-hole-by-mentalpop
+        #voyager image: https://www.reddit.com/r/PixelArt/comments/c83okd/voyager/
+        #planet image: https://www.reddit.com/r/PixelArt/comments/16zw3mh/pixel_art_of_saturn_orginal_picture_from_nasa_on/
+        #star image: https://rare-gallery.com/uploads/posts/1102198-illustration-video-games-pixel-art-planet-space-Earth-pixels-circle-atmosphere-universe-indie-games-quasars-Steredenn-screenshot-computer-wallpaper-atmosphere-of-earth-.png
+        for i in range(4):
+            labelText = potentialLabels[i]
+            drawRect(i*section + 30, 200, section - 10, app.height - 500, fill = backGroundColor, border = 'lightGrey')
+            drawLabel(f'{labelText}', i*section + 30 + section/2, 250, size = 25, bold = True, fill = 'white')
+            drawImage(potentialUrls[0], i*section + 40, 300, width = (section -30), height = (section -30))
+    if mainLabelKey == 1:
+        potentialLabels = ['Mass', 'Friction Coeffishent', 'Push Strength']
+        backLabels = ['kg', '', 'N']
+        for i in range(3):
+            heightLevel = i*100
+            drawRect(100, heightLevel + 300, app.width - 200, 80, fill = backGroundColor, border = 'lightGrey')
+            
+            drawLabel(f'{potentialLabels[i]}: {app.playerChars[i]} {backLabels[i]}', 
+                      app.width/2, heightLevel + 340, bold = True, fill = 'white', size = 25)
+            drawCircle(150, heightLevel + 340, 20, fill = 'red')
+            drawCircle(150 + app.width-300, heightLevel + 340, 20, fill = 'green')
+        drawLabel('Press the green button to increase value\nPress the red button to decrease value',
+                  app.width/2, 200, size = 25, bold = True, fill = 'white')
+
+def loadingScreenButtonPress(app, mainLabelKey, mouseX, mouseY):
+    if mainLabelKey == 0:
+        section = (app.width - 60)//4
+        trueX = int((mouseX)// section)
+        if mouseX > 30 and mouseX < (app.width - 30) and mouseY > 200 and mouseY < (app.height - 500) + 200:
+            app.difficultyKey = trueX
+            app.mainLabelKey +=1
+    if mainLabelKey == 1:
+        trueY = (mouseY-300)//(100)
+        print(distance(mouseX, mouseY, 150, (trueY *100) + 300))
+        if distance(mouseX, mouseY, 150, (trueY *100) + 300) < 20:
+            if trueY == 0 and app.playerChars[0] >= 20 and app.playerChars[0] <= 100:
+                app.playerChars[0] -= 1
+            elif trueY == 1 and app.playerChars[1] >= .01 and app.playerChars[1] <= .5:
+                app.playerChars[1] -= .01
+            elif trueY == 2 and app.playerChars[2] >= 100 and app.playerChars[2] <= 1000:
+                app.playerChars[2] -= 50
+        if distance(mouseX, mouseY, app.width-150, (trueY *100) + 300) <= 20:
+            print(trueY)
+            if trueY == 0 and app.playerChars[0] >= 20 and app.playerChars[0] <= 100:
+                app.playerChars[0] += 1
+            elif trueY == 1 and app.playerChars[1] >= .01 and app.playerChars[1] <= .5:
+                app.playerChars[1] += .01
+            elif trueY == 2 and app.playerChars[2] >= 100 and app.playerChars[2] <= 1000:
+                app.playerChars[2] += 50
+            
+
+        
+def distance(x0, y0, x1, y1):
+    return ((x0-x1)**2 + (y0 -y1)**2) **.5
+    
+
+
+
     
 def main():
     runApp()

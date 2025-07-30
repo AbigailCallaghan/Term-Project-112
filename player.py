@@ -19,7 +19,7 @@ class Player:
         self.inputForce = 0
         self.rotationSpeed = 45 * (math.pi/180)
         self.moving = False
-        
+        self.totalDistance = 0
         self.playerAngle = 45 * (math.pi / 180) + 180
 
     
@@ -42,16 +42,17 @@ class Player:
     
     def buggyForces(self, app):
         if self.velocity >= 0:
+            slope = app.potentialMaps[app.mapKey][3]
+            weight = 9.8 * 68 * math.cos(slope)
             normal = 9.8 * 68
             friction = normal * .05
             drag = (self.velocity ** 2) * .5 * 1.225 * 76.505653 * .47
-            repellingForces = (friction + drag) / (app.stepsPerSecond)
+            repellingForces = (friction + drag + weight) / (app.stepsPerSecond)
             self.inputForce = (self.inputForce - repellingForces) if (self.inputForce - repellingForces)>= 0 else -(repellingForces)
             acceleration = self.inputForce / 68
             self.velocity += acceleration
         else:
-            self.velocity = 0
-       
+            self.velocity = 0  
     
     def move(self, app):
         self.buggyForces(app)

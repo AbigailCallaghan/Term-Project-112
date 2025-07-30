@@ -63,11 +63,7 @@ class Course:
             for row in range(len(map) -1, -1, -1):
                 for col in range(len(map[0])):
                     if self.map[row][col] == 0:
-                        row *= app.tileSize
-                        row += app.tileSize /2
-                        col *= app.tileSize
-                        col += app.tileSize /2
-                        return int(row//app.tileSize), int(col//app.tileSize)
+                        return row, col
         if direction == 'up':
             for row in range(len(map)):
                 for col in range(len(map[0])):
@@ -76,21 +72,25 @@ class Course:
         return 'all walls'
     
     def combineMaps(self, app, directionOne, lengthOne, widthOne, directionTwo, lengthTwo, widthTwo):
+    
         mapOne = self.createMap(lengthOne, widthOne, directionOne)
         mapTwo = self.createMap(lengthTwo, widthTwo, directionTwo)
         mapOneCols = len(mapOne[0])
         mapTwoCols = len(mapTwo[0])
         rowMapOneWhiteSpace, colMapOneWhiteSpace = self.findClosestWhiteSpacePartialMap(app, 'up', mapOne)
         rowMapTwoWhiteSpace, colMapTwoWhiteSpace = self.findClosestWhiteSpacePartialMap(app, 'down', mapTwo)
+        
         #for the first one this doesn't matter, but the maps are spliced at the end
         if app.mapKey != 0:
-            print('called')
             mapOne.append([1] * len(mapOne[0]))
-        print(len(mapOne))
 
-        #cols aren't equal
+        #this is for curved up
         if mapOneCols < mapTwoCols:
+            print('this is fine')
             difference = mapTwoCols - mapOneCols
+            if directionOne == 'straight':
+                difference += 1
+            
             beforeRow = colMapTwoWhiteSpace - colMapOneWhiteSpace
             afterRow = difference - beforeRow
             for row in range(len(mapOne)):
@@ -98,6 +98,8 @@ class Course:
                     mapOne[row].append(1)
         elif mapTwoCols < mapOneCols:
             difference = mapOneCols - mapTwoCols
+            if directionOne == 'straight':
+                difference += 1
             beforeRow = colMapOneWhiteSpace - colMapTwoWhiteSpace
             afterRow = difference - beforeRow
             for row in range(len(mapTwo)):
@@ -107,22 +109,27 @@ class Course:
                 for k in range(afterRow):
                   mapTwo[row].append(1)
         # doesn't matter if rows are unequal, only widths since a grid is being generated
-        
         self.map = mapTwo[:-1] + mapOne[1:]
-
-
+        self.normalizeMap(app)
+    
+    def normalizeMap(self, app):
+        rows = len(self.map)
+        cols = len(self.map[0])
+        rowDifference = 16 - rows
+        colDifference = 16 - cols
+        for row in range(rows):
+            for i in range(colDifference):
+                self.map[row].append(1)
+        for k in range(rowDifference):
+            newRow = ([1]* cols + [1] * colDifference)
+            
+            self.map.append(newRow)
         
     def wallInPosition(self, app, x, y):
         newX = int(x//app.tileSize)
         newY = int(y//app.tileSize)
-        
         return self.map[newY][newX]
-    
-    def wallInPositionClone(self, app, x, y):
-        newX = int(x//app.tileSize)
-        newY = int(y//app.tileSize)
-        print(newX, newY, 'x, y')
-        return self.map[newY][newX]
+  
 
     def drawMap(self, app):
         for row in range(len(self.map)):

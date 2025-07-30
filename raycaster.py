@@ -26,7 +26,7 @@ class Raycaster:
         
         for ray in self.rays:
             slope = 15
-            wallHeight = 30
+            wallHeight = 64
             url = 'https://piskel-imgstore-b.appspot.com/img/c6646700-6c9b-11f0-b29a-6f0689713f11.gif'
 
             #for slopes need to apply based off of numrays
@@ -39,6 +39,6 @@ class Raycaster:
             
             else:
                #drawImage(url, count*app.resilution, startOfDrawing, width = app.resilution, height =endOfDrawing)
-                drawRect(count*app.resilution, startOfDrawing, app.resilution, endOfDrawing, fill = rgb(ray.color, ray.color, ray.color))
+                drawRect(count*app.resilution, startOfDrawing - 20, app.resilution, endOfDrawing, fill = rgb(ray.color, ray.color, ray.color))
             count +=1
         
