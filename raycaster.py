@@ -25,17 +25,20 @@ class Raycaster:
         count = 0
         
         for ray in self.rays:
-            #ray.drawRays(app)
             slope = 15
             wallHeight = 30
+            url = 'https://piskel-imgstore-b.appspot.com/img/c6646700-6c9b-11f0-b29a-6f0689713f11.gif'
 
             #for slopes need to apply based off of numrays
             lineHeight = (wallHeight / ray.distance) * 415
             startOfDrawing = (app.height / 2) - (lineHeight / 2)
             endOfDrawing = lineHeight
-            print('end', endOfDrawing, 'start', startOfDrawing, count)
             top = .1*count
-            drawRect(count*app.resilution, startOfDrawing - top, app.resilution, endOfDrawing +top, fill = 'navy')
-
+            if app.drawMap == True:
+                ray.drawRays(app)
+            
+            else:
+               #drawImage(url, count*app.resilution, startOfDrawing, width = app.resilution, height =endOfDrawing)
+                drawRect(count*app.resilution, startOfDrawing, app.resilution, endOfDrawing, fill = rgb(ray.color, ray.color, ray.color))
             count +=1
         

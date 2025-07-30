@@ -2,21 +2,24 @@ from cmu_graphics import *
 import math
 from course import Course
 
+def distance(x0, y0, x1, y1):
+    return ((x0-x1)**2 + (y0 -y1)**2) **.5
+
 class Player:
 
-    def __init__(self, course):
-        self.x = 50
-        self.y = app.height - 60
+    def __init__(self, app, course):
+        self.course = course
+        self.y, self.x = self.course.findClosestWhiteSpace(app, 'down')
         self.radius = 5
         self.dx = .1
         self.dy = .1
         self.turnDirection = 0 # 1 player is rotating to right, -1 rotating to left
         self.walkDirection = 0
-        self.velocity = 1
+        self.velocity = 0
         self.inputForce = 0
         self.rotationSpeed = 45 * (math.pi/180)
         self.moving = False
-        self.course = Course()
+        
         self.playerAngle = 45 * (math.pi / 180) + 180
 
     
@@ -24,33 +27,28 @@ class Player:
         drawCircle(self.x, self.y, self.radius, fill = 'red')
         drawLine(self.x, self.y, self.x + math.cos(self.playerAngle) *10 , self.y + math.sin(self.playerAngle) * 10, fill = 'red')
 
-    
-
     def onKeyPress(self, app, key):
-        print(key, self.velocity)
-        if key == 'w':
-            self.walkDirection = 1
-           
-        if key == 's':
-            self.walkDirection = -1
-           
+        
         if key == 'a':
             self.turnDirection = -1
             
         if key == 'd':
             self.turnDirection = 1
         if key == 'space':
-            self.inputForce += 400
+            self.inputForce += 100
+        
         self.move(app)
+        
     
     def buggyForces(self, app):
         if self.velocity >= 0:
             normal = 9.8 * 68
             friction = normal * .05
             drag = (self.velocity ** 2) * .5 * 1.225 * 76.505653 * .47
-            self.inputForce = (self.inputForce - friction - drag) if self.inputForce >= 0 else 0
+            repellingForces = (friction + drag) / (app.stepsPerSecond)
+            self.inputForce = (self.inputForce - repellingForces) if (self.inputForce - repellingForces)>= 0 else -(repellingForces)
             acceleration = self.inputForce / 68
-            self.velocity += acceleration * (1/app.stepsPerSecond)
+            self.velocity += acceleration
         else:
             self.velocity = 0
        
@@ -59,31 +57,30 @@ class Player:
         self.buggyForces(app)
         isWall = self.course.wallInPosition(app, self.x + math.cos(self.playerAngle) * self.velocity, self.y + math.sin(self.playerAngle) * self.velocity)
         self.playerAngle += self.turnDirection * self.rotationSpeed
-       # if self.playerAngle > 180:
-       #     self.playerAngle = 0
         if isWall == 0:
-            self.x += math.cos(self.playerAngle) * self.velocity
-            self.y += math.sin(self.playerAngle) * self.velocity
+            if self.x >=0 and self.y >=0:
+                self.x += math.cos(self.playerAngle) * self.velocity
+                self.y += math.sin(self.playerAngle) * self.velocity
+            
+   
 
+    def onMousePress(self, app, mouseX, mouseY):
+        if (mouseY >= (app.height - app.steeringWheelHeight) and mouseY <= app.height - 20 and 
+            mouseX >= (app.steeringWheelLeftCordinates[0] - 10) and (mouseX <= app.steeringWheelRightCordinates[0] + 10)):
+            leftX = app.steeringWheelLeftCordinates[0]
+            leftY = app.steeringWheelLeftCordinates[1]
+            rightX = app.steeringWheelRightCordinates[0]
+            rightY = app.steeringWheelRightCordinates[1]
+            distanceBetweenLeft = distance(mouseX, mouseY, leftX, leftY)
+            distanceBetweenRight = distance(mouseX, mouseY, rightX, rightY)
+            #tells which direction you're trying to steer in
+            #the closer you are to the center of the wheel, the less force you imput
+            if distanceBetweenRight > distanceBetweenLeft:
+                self.turnDirection -= (1/distanceBetweenLeft) * self.rotationSpeed
+            else:
+                self.turnDirection += (1/distanceBetweenRight) * self.rotationSpeed
+            self.move(app)
 
-    def onMouseMove(self, app, mouseX, mouseY):
-       # print(self.playerAngle, 'angle')
-        #if mouseX >= app.width // 2:
-         #   self.turnDirection += .01
-        #if mouseX < app.width // 2:
-        #    self.turnDirection += -.01
-        if self.playerAngle > 360:
-            self.playerAngle = 0
-       
-        self.move(app)
-
-
-
-        
-        
-       
-        
-    
     def whileKeysPressed(self):
         if self.moving == True:
             moveStep = self.walkDirection * self.moveSpeed
@@ -91,11 +88,4 @@ class Player:
             self.x += math.cos(self.playerAngle) * moveStep
             self.y += math.sin(self.playerAngle) * moveStep
 
-
-    def onKeyRelease(self, key):
-        self.moving = False
-        if key == 'w' or key == 's':
-            self.walkDirection = 0
-        if key == 'a' or key == 'd':
-            self.turnDirection = 0
 

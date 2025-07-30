@@ -13,8 +13,6 @@ def convertAngle(anlge):
 def distance(x0, y0, x1, y1):
     return ((x0-x1)**2 + (y0 -y1)**2) **.5
 
-
-
 class Ray:
     def __init__(self, angle, player, course):
         self.rayAngle = convertAngle(angle)
@@ -27,9 +25,7 @@ class Ray:
         self.wallHitX = 0
         self.wallHitY = 0
         self.distance = 0
-
-    
-
+        self.color = 255
 
     def cast(self, app):
         #check horizontal driection
@@ -41,7 +37,7 @@ class Ray:
         firstIntersectionInY = None
 
         if self.facesUp: 
-            firstIntersectionInY = (self.player.y // app.tileSize) * app.tileSize - 1
+            firstIntersectionInY = (self.player.y // app.tileSize) * app.tileSize - .001
         elif self.facesDown:
             firstIntersectionInY = ((self.player.y // app.tileSize) * app.tileSize ) + app.tileSize
 
@@ -77,7 +73,7 @@ class Ray:
             firstIntersectionInX = ((self.player.x // app.tileSize) * app.tileSize) + app.tileSize
             xA = app.tileSize
         elif self.facesLeft:
-            firstIntersectionInX = (self.player.x //app.tileSize) * app.tileSize - 1
+            firstIntersectionInX = (self.player.x //app.tileSize) * app.tileSize - .001
             xA = -app.tileSize
 
         firstIntersectionInY = self.player.y + (firstIntersectionInX - self.player.x) * math.tan(self.rayAngle)
@@ -109,15 +105,14 @@ class Ray:
             self.wallHitX = horizontalHitX
             self.wallHitY = horizontalHitY
             self.distance = horizontalDistance
+            self.color = 255/2
         else:
             self.wallHitX = verticalHitX
             self.wallHitY = verticalHitY
             self.distance = verticalDistance
+            self.color = 255
         self.distance *= math.cos(self.player.playerAngle - self.rayAngle)
 
-
-
-    
 
     def drawRays(self, app):
        #drawLine(self.player.x, self.player.y, self.player.x + math.cos(self.rayAngle) * 50, self.player.y + math.sin(self.rayAngle) * 50, fill = 'red')
