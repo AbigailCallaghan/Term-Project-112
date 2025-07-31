@@ -2,7 +2,7 @@ from cmu_graphics import *
 import math
 from player import Player
 from course import Course
-
+#the ray class was heavily inspired by this raycasting tutorial https://www.youtube.com/watch?v=E18bSJezaUE 
 #makes sure angle is always between 0 and 2pi
 def convertAngle(anlge): 
     angle = anlge % (2* math.pi)
@@ -52,7 +52,8 @@ class Ray:
         elif self.facesDown:
             yA = app.tileSize
         xA = yA / math.tan(self.rayAngle)
-        while (nextHorizontalIntersectionX <= app.width and nextHorizontalIntersectionX >= 0 and nextHorizontalIntersectionY <= app.height and nextHorizontalIntersectionY >=0):
+        while (nextHorizontalIntersectionX <= app.width and nextHorizontalIntersectionX >= 0 and 
+               nextHorizontalIntersectionY <= app.height and nextHorizontalIntersectionY >=0):
             if app.course.wallInPosition(app, nextHorizontalIntersectionX, nextHorizontalIntersectionY):
                 horizontalWallFound = True
                 horizontalHitX = nextHorizontalIntersectionX
@@ -115,6 +116,5 @@ class Ray:
 
 
     def drawRays(self, app):
-       #drawLine(self.player.x, self.player.y, self.player.x + math.cos(self.rayAngle) * 50, self.player.y + math.sin(self.rayAngle) * 50, fill = 'red')
        drawLine(self.player.x, self.player.y,  self.wallHitX, self.wallHitY, fill = 'red')
         

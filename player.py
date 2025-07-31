@@ -1,6 +1,9 @@
 from cmu_graphics import * 
 import math
 from course import Course
+#the player class was partially inspired by the raycasting tutorial
+#specifically the player angle speeds and the increase to the player x and y
+#the key press, mouse press, and other parts of move are all my own ideas
 
 def distance(x0, y0, x1, y1):
     return ((x0-x1)**2 + (y0 -y1)**2) **.5
@@ -25,7 +28,8 @@ class Player:
     
     def drawPlayer(self, app):
         drawCircle(self.x, self.y, self.radius, fill = 'red')
-        drawLine(self.x, self.y, self.x + math.cos(self.playerAngle) *10 , self.y + math.sin(self.playerAngle) * 10, fill = 'red')
+        drawLine(self.x, self.y, self.x + math.cos(self.playerAngle) *10 , 
+                 self.y + math.sin(self.playerAngle) * 10, fill = 'red')
 
     def onKeyPress(self, app, key):
         if key == 'a' and app.playerChars[3] == 'Keys':
@@ -43,6 +47,8 @@ class Player:
         self.move(app)
         
     #I used AI to check that the physics was semi realistic after I wrote the code
+    #there were a few tweaks to the physics
+    #but the basic code remained the same
     def buggyForces(self, app):
         if self.velocity >= 0:
             slope = app.potentialMaps[app.mapKey][3]
@@ -63,7 +69,8 @@ class Player:
     
     def move(self, app):
         self.buggyForces(app)
-        isWall = self.course.wallInPosition(app, self.x + math.cos(self.playerAngle) * self.velocity, self.y + math.sin(self.playerAngle) * self.velocity)
+        isWall = self.course.wallInPosition(app, self.x + math.cos(self.playerAngle) * self.velocity, 
+                                            self.y + math.sin(self.playerAngle) * self.velocity)
         self.playerAngle += self.turnDirection * self.rotationSpeed
         if isWall == 0:
             if self.x >=0 and self.y >=0:

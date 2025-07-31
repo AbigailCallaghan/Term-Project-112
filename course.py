@@ -92,9 +92,7 @@ class Course:
         #this is for curved up
         if mapOneCols <= mapTwoCols:
             difference = mapTwoCols - mapOneCols
-          #  if directionOne == 'curved up':
-             #   for row in range(len(mapOne)):
-             #       mapOne[row].append(1)
+          
             
             beforeRow = colMapTwoWhiteSpace - colMapOneWhiteSpace
             afterRow = difference - beforeRow
@@ -110,11 +108,11 @@ class Course:
             afterRow = difference - beforeRow
             for row in range(len(mapTwo)):
                 for i in range(beforeRow):
-                   # mapTwo[row].append(1)
+                  
                     mapTwo[row].insert(0, 1)
                 for k in range(afterRow):
                   mapTwo[row].append(1)
-        # doesn't matter if rows are unequal, only widths since a grid is being generated
+        
         self.map = mapTwo[:-1] + mapOne[1:]
         self.normalizeMap(app)
     

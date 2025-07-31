@@ -2,6 +2,8 @@ from cmu_graphics import *
 import math
 from ray import Ray
 from course import Course
+#the raycaster class was also inspired by the ray casting tutorial tutorial https://www.youtube.com/watch?v=E18bSJezaUE 
+
 
 class Raycaster:
     
