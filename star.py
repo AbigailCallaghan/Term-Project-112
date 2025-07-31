@@ -1,6 +1,6 @@
 from cmu_graphics import * 
 import random
-
+#this is for the intro
 class Star:
     def __init__(self, x, y, opacity):
         self.x = x
@@ -25,7 +25,6 @@ class AllStars:
         self.generateAllStars(app)
     
     def generateAllStars(self, app):
-        print('')
         starAmount = random.randint(5, 10)
         for star in range(starAmount):
             self.allStars.add(self.generateRandomStar(app))

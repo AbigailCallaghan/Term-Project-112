@@ -4,14 +4,12 @@ from player import Player
 from raycaster import Raycaster
 from course import Course
 from star import AllStars
-
-#using this https://www.youtube.com/watch?v=E18bSJezaUE tutorial for basic raycaster 
-#it's in pygame so i'm translating it to cmu graphics
-# i will be rewriting most of the code, I am just getting the basics so the code right now follows the tutorial pretty closely
+#settings class, you run the game from here
+#Used this https://www.youtube.com/watch?v=E18bSJezaUE tutorial for basic raycaster 
 def onAppStart(app):
     app.potentialMaps = {0: ['straight', 9, 5, 5, True], 1:['curved up', 5, 9, -3, False]}
     # easy is more downhill and has wider areas
-    #hard has increased speed
+    #hard has increased speed, narrower areas
     app.difficultyLevels = {'easy': {'length range': (4, 8), 'width range': (3, 7), 'slope range': (-5, 5)},
                             'medium': {'length range': (4, 8), 'width range': (2, 6), 'slope range': (-10, 10)},
                             'hard': {'length range': (4, 8), 'width range': (2, 5), 'slope range': (-15, 15)},
@@ -48,6 +46,7 @@ def onAppStart(app):
     app.coolDown = 0
     app.drawInstructions = False
     app.maxCoolDown = 250
+    app.backgroundImage = 0
 
 def redrawAll(app):
     if app.loadingScreen == True:
@@ -61,10 +60,12 @@ def redrawAll(app):
         drawDeathScreen(app)
     else:
         drawRect(0, 0, app.width, app.height, fill = 'black')
+        drawBackGroundImage(app)
         if app.drawMap == True:
             app.course.drawMap(app)
             app.player.drawPlayer(app)
             app.raycaster.drawAllRays(app)
+            
         else:
             if app.pushZone == True:
                 drawPushingZone(app)
@@ -73,6 +74,17 @@ def redrawAll(app):
                 drawSteeringWheel(app)
 
             drawSideBar(app)
+def drawBackGroundImage(app):
+    potentialBackGround = ['/Users/abigailcallaghan/Documents/GitHub/Term-Project-112/GameBackGroundFiveGame.webp',
+                           '/Users/abigailcallaghan/Documents/GitHub/Term-Project-112/backGroundOneGame.png',
+                           '/Users/abigailcallaghan/Documents/GitHub/Term-Project-112/backGroundTwoGame.png',
+                           '/Users/abigailcallaghan/Documents/GitHub/Term-Project-112/backGroundThreeGame.png',
+                           '/Users/abigailcallaghan/Documents/GitHub/Term-Project-112/backGroundSix.png']
+    #image credits:
+    #https://www.reddit.com/r/PixelArt/comments/odvyko/deep_space/
+    #https://x.com/norma_2d/status/1374371658920722441
+    drawImage(potentialBackGround[app.backgroundImage], app.width/2, app.height/2, 
+              width = 900, height = app.height, align = 'center')
 
 def steeringWheelDimensions(app):
     distanceFromSides = app.width/6
@@ -94,16 +106,23 @@ def drawSideBar(app):
     nextSectionType = app.potentialMaps[app.mapKey + 1][0]
     nextSlope = app.potentialMaps[app.mapKey + 1][3]
     trueDistance = roundToDeci(app.player.totalDistance/ 1000, 2)
-    drawLabel(f'Current section {sectionType} with slope {slope}', labelLeft, 60, font = app.font, fill = fontColor, align = 'left')
-    drawLabel(f'Next section {nextSectionType} with slope {nextSlope}', labelLeft, 80, font = app.font, fill = fontColor, align = 'left')
-    drawLabel(f'Total distance: {trueDistance}km', labelLeft, 100, font = app.font, fill = fontColor, align = 'left')
+    drawLabel(f'Current section {sectionType} with slope {slope}', labelLeft, 60, 
+              font = app.font, fill = fontColor, align = 'left')
+    drawLabel(f'Next section {nextSectionType} with slope {nextSlope}', labelLeft, 
+              80, font = app.font, fill = fontColor, align = 'left')
+    drawLabel(f'Total distance: {trueDistance}km', labelLeft, 100, font = app.font, 
+              fill = fontColor, align = 'left')
     
 def drawSteeringWheel(app):
-    steeringWheelColor = 'darkSlateGray'
-    drawRect(app.steeringWheelLeftCordinates[0], app.steeringWheelLeftCordinates[1]-10, app.width - 2* app.steeringWheelLeftCordinates[0], 20, fill = steeringWheelColor)
-    drawCircle(app.steeringWheelLeftCordinates[0],  app.steeringWheelLeftCordinates[1], 10, fill = steeringWheelColor)
-    drawCircle(app.width - app.steeringWheelLeftCordinates[0], app.steeringWheelLeftCordinates[1], 10, fill = steeringWheelColor)
-    drawRect(app.width/2, app.steeringWheelLeftCordinates[1] + 30, 30, app.steeringWheelHeight, fill = steeringWheelColor, align = 'center')
+    steeringWheelColor = 'black'
+    drawRect(app.steeringWheelLeftCordinates[0], app.steeringWheelLeftCordinates[1]-10, 
+             app.width - 2* app.steeringWheelLeftCordinates[0], 20, fill = steeringWheelColor)
+    drawCircle(app.steeringWheelLeftCordinates[0],  app.steeringWheelLeftCordinates[1], 
+               10, fill = steeringWheelColor)
+    drawCircle(app.width - app.steeringWheelLeftCordinates[0], app.steeringWheelLeftCordinates[1], 
+               10, fill = steeringWheelColor)
+    drawRect(app.width/2, app.steeringWheelLeftCordinates[1] + 30, 30, app.steeringWheelHeight, 
+             fill = steeringWheelColor, align = 'center')
 
 def onStep(app):
     if app.intro and app.loadingScreen:
@@ -116,17 +135,11 @@ def onStep(app):
             switchMaps(app)
         if app.manual == False and app.gameOver == False:
             app.player.move(app)
-        if app.player.velocity == 0 and app.pushZone == False and app.gameOver == False and app.loadingScreen == False:
+        if (app.player.velocity == 0 and app.pushZone == False and app.gameOver == False and 
+            app.loadingScreen == False):
             app.gameOver = True
         if app.pushZone == True and app.coolDown > 0:
             app.coolDown -=25
-            
-
-def angleInUnitCircle(angle):
-    angle = angle % (2 * math.pi)
-    if angle < 0:
-        angle = (2 * math.pi) + angle
-    return angle
 
 def onKeyPress(app, key):
     if app.intro and app.loadingScreen:
@@ -172,7 +185,6 @@ def drawPushingZone(app):
     
 
 
-
 def onMousePress(app, mouseX, mouseY):
     if app.loadingScreen == True:
         loadingScreenButtonPress(app, app.mainLabelKey, mouseX, mouseY)
@@ -196,8 +208,8 @@ def createMap(app):
         placeHolderX = app.player.x
         #this is due to an off by one map error I kept getting
         #originally I solved this using reccursion but it threw another error
-        #I fixed this bug after my reflection so my reflection says that there is recursion in generate partial map to fix this bug
-        #which is no longer true
+        #I fixed this bug after my reflection so my reflection says that there is 
+        # recursion in generate partial map to fix this bug which is no longer true
         #There is still recursion in addToThirteen
         if len(app.course.map[0]) != len(app.course.map[mapOneLength + mapTwoLength]):
             print('this is called')
@@ -212,7 +224,6 @@ def createMap(app):
         if app.course.map[int(app.player.y//app.tileSize)][int(placeHolderX//app.tileSize)] == 0:
             app.player.x = placeHolderX
         
-
 def generatePartialMap(app):
     nextDirection = 'curved up' if app.mapKey % 2 == 1 else 'straight'
     difficultyLevels = app.difficultyLevels[app.difficultyKey]
@@ -224,8 +235,8 @@ def generatePartialMap(app):
     slopeLo, slopeHi = slopeRange[0], slopeRange[1]
     currentLength = app.potentialMaps[app.mapKey + 1][1]
     currentWidth = app.potentialMaps[app.mapKey + 1][2]
-    nextLength = addToFourteen(random.randint(lengthLo, lengthHi),currentLength, lengthLo, lengthHi)
-    nextWidth = addToFourteen(random.randint(widthLo, widthHi), currentWidth, widthLo, widthHi)
+    nextLength = addToThirteen(random.randint(lengthLo, lengthHi),currentLength, lengthLo, lengthHi)
+    nextWidth = addToThirteen(random.randint(widthLo, widthHi), currentWidth, widthLo, widthHi)
     slope = random.randint(slopeLo, slopeHi)
     pushingZone = True if random.randint(0, 2) == 2 else False
     if nextDirection == 'curved up':
@@ -233,11 +244,11 @@ def generatePartialMap(app):
             nextWidth -= abs(13 - (nextLength + currentWidth + nextWidth))
     return [nextDirection, nextLength, nextWidth, slope, pushingZone]
 
-def addToFourteen(val1, val2, lo, hi):
+def addToThirteen(val1, val2, lo, hi):
     if val1 + val2 <= 13:
         return val1
     else:
-        return addToFourteen(random.randint(lo, hi),val2, lo, hi)
+        return addToThirteen(random.randint(lo, hi),val2, lo, hi)
 
 def switchMaps(app):
     trueYCoord = int(app.player.y//app.tileSize)
@@ -247,12 +258,15 @@ def switchMaps(app):
         app.raycaster.castAllRays(app)
         app.pushZone = app.potentialMaps[app.mapKey][4]
         app.maxCoolDown = 250
+        app.backgroundImage = random.randint(0,4)
 
 def drawIntroAnimation(app):
     drawRect(0, 0, app.width, app.height, fill = rgb(0, 0, 30))
     app.allStars.drawAllStars()
-    drawLabel('Press i for instructions', app.width/2, app.height/2 + 200, fill = 'white', bold = True, size = 25)
-    drawLabel('Press enter to move to the loading screen', app.width/2, app.height/2 + 150, fill = 'white', bold = True, size = 25)
+    drawLabel('Press i for instructions', app.width/2, app.height/2 + 200, 
+              fill = 'white', bold = True, size = 25)
+    drawLabel('Press enter to move to the loading screen', app.width/2, app.height/2 + 150, 
+              fill = 'white', bold = True, size = 25)
 
     url = '/Users/abigailcallaghan/Documents/GitHub/Term-Project-112/SpaceRacingTitle.jpeg'
     #source: https://perchance.org/ai-pixel-art-generator
@@ -260,19 +274,32 @@ def drawIntroAnimation(app):
 
 def instructions(app):
     drawRect(0, 0, app.width, app.height)
-    drawLabel('Adjust difficulty and vehicle characteristics in loading screen', app.width/2-350, app.height - 600, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel('If the steering wheel is toggled steer cart by clicking on the sides of the steering wheel',  app.width/2-350, app.height - 575, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel('(located at the bottom of the screen)', app.width/2-350, app.height - 550, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel("If keys are toggled, steer cart by pressing 'a' to turn left and 'b' to turn right",  app.width/2 - 350, app.height - 525, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel("Press 'm' to switch between first person view and grid view",  app.width/2 - 350, app.height - 500, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel("At the top left is your status bar",  app.width/2 -350, app.height - 475, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel("It displays current velocity, slope, distance traveled, ", app.width/2 - 350, app.height - 450, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel("type and characteristics of your current zone and next zone",  app.width/2 - 350, app.height - 425, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel("Move by pressing the space bar when you are in a push zone",  app.width/2 - 350, app.height - 400, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel("After you push, pushing will be on a cool down, ",app.width/2 - 350, app.height - 375, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel("The time until your next push is displayed by the green bar",  app.width/2 - 350, app.height - 350, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel('The game ends when you cannot move (velocity is zero) and you are not in a push zone',  app.width/2 - 350, app.height - 325, fill = 'white', bold = True, size = 16, align = 'left')
-    drawLabel("Press i to return to main menu: ", app.width/2 - 350, app.height - 300, fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel('Adjust difficulty and vehicle characteristics in loading screen', app.width/2-350, 
+              app.height - 600, fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel('If the steering wheel is toggled steer cart by clicking on the sides of the steering wheel', 
+               app.width/2-350, app.height - 575, fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel('(located at the bottom of the screen)', app.width/2-350, app.height - 550, fill = 'white', 
+              bold = True, size = 16, align = 'left')
+    drawLabel("If keys are toggled, steer cart by pressing 'a' to turn left and 'b' to turn right", 
+               app.width/2 - 350, app.height - 525, fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel("Press 'm' to switch between first person view and grid view",  
+              app.width/2 - 350, app.height - 500, fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel("At the top left is your status bar",  app.width/2 -350, 
+              app.height - 475, fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel("It displays current velocity, slope, distance traveled, ", app.width/2 - 350, 
+              app.height - 450, fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel("type and characteristics of your current zone and next zone",  app.width/2 - 350, 
+              app.height - 425, fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel("Move by pressing the space bar when you are in a push zone",  app.width/2 - 350, 
+              app.height - 400, fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel("After you push, pushing will be on a cool down, ",app.width/2 - 350, app.height - 375, 
+              fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel("The time until your next push is displayed by the green bar",  app.width/2 - 350, 
+              app.height - 350, fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel('The game ends when you cannot move (velocity is zero) and you are not in a push zone',  
+              app.width/2 - 350, app.height - 325, fill = 'white', bold = True, size = 16, align = 'left')
+    drawLabel("Press i to return to main menu: ", 
+              app.width/2 - 350, app.height - 300, fill = 'white', bold = True, size = 16, align = 'left')
 
 def drawDeathScreen(app):
     drawRect(0, 0, app.width, app.height, opacity=50)
@@ -314,7 +341,8 @@ def drawLoadingScreenOption(app, mainLabelKey):
         #star image: https://rare-gallery.com/uploads/posts/1102198-illustration-video-games-pixel-art-planet-space-Earth-pixels-circle-atmosphere-universe-indie-games-quasars-Steredenn-screenshot-computer-wallpaper-atmosphere-of-earth-.png
         for i in range(4):
             labelText = potentialLabels[i]
-            drawRect(i*section + 30, 200, section - 10, app.height - 500, fill = backGroundColor, border = 'lightGrey')
+            drawRect(i*section + 30, 200, section - 10, app.height - 500, 
+                     fill = backGroundColor, border = 'lightGrey')
             drawLabel(f'{labelText}', i*section + 30 + section/2, 250, size = 25, bold = True, fill = 'white')
             drawImage(potentialUrls[i], i*section + 40, 300, width = (section -30), height = (section -30))
     if mainLabelKey == 1:

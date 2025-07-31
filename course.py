@@ -60,6 +60,7 @@ class Course:
                         col *= app.tileSize
                         col += app.tileSize /2
                         return row, col
+        
         return 'all walls'
     
     def findClosestWhiteSpacePartialMap(self, app, direction, map):
@@ -142,7 +143,8 @@ class Course:
         for row in range(len(self.map)):
              for col in range(len(self.map[0])):
                 if self.map[row][col] == 1:
-                    drawRect(col * app.tileSize, row * app.tileSize, app.tileSize - 1, app.tileSize -1, fill = 'black')
+                    pass
+                  #  drawRect(col * app.tileSize, row * app.tileSize, app.tileSize - 1, app.tileSize -1, fill = 'black')
                 else:
                     drawRect(col * app.tileSize, row * app.tileSize, app.tileSize -1, app.tileSize -1, fill = 'white')
 
