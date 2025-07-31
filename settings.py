@@ -12,7 +12,7 @@ def onAppStart(app):
     # easy is more downhill and has wider areas
     #hard has increased speed
     app.difficultyLevels = {'easy': {'length range': (4, 8), 'width range': (4, 7), 'slope range': (-5, 5)},
-                            'medium': {'length range': (2, 8), 'width range': (2, 6), 'slope range': (-10, 10)},
+                            'medium': {'length range': (2, 8), 'width range': (2, 5), 'slope range': (-10, 10)},
                             'hard': {'length range': (1, 8), 'width range': (1, 4), 'slope range': (-15, 15)},
                             'chaos':{'length range': (1, 8), 'width range': (1, 7), 'slope range': (-15, 15)}}
     app.playerChars = [50, .05, 100]
@@ -94,7 +94,8 @@ def onStep(app):
     #app.player.move()
     app.raycaster.castAllRays(app)
     app.player.turnDirection = 0
-    switchMaps(app)
+    if app.nextBottom != 0:
+        switchMaps(app)
     if app.manual == False:
         app.player.move(app)
 
@@ -135,11 +136,12 @@ def createMap(app):
         mapTwoLength = app.potentialMaps[app.mapKey + 1][1]
         mapOneWidth = app.potentialMaps[app.mapKey][2]
         mapTwoWidth = app.potentialMaps[app.mapKey + 1][2]
-        app.nextBottom = mapOneLength + 1
+        app.nextBottom = mapOneLength +1
         app.course.combineMaps(app, mapOneDirection, mapOneLength, mapOneWidth, mapTwoDirection, mapTwoLength, mapTwoWidth)
         #need to reset player position for y, x is fine
         placeHolderX = app.player.x
-        app.player.y, app.player.x =  app.course.findClosestWhiteSpace(app, 'down')
+        print(app.course.map)
+        app.player.y, app.player.x = app.course.findClosestWhiteSpace(app, 'down')
         if app.course.map[int(app.player.y//app.tileSize)][int(placeHolderX//app.tileSize)] == 0:
             app.player.x = placeHolderX
         
@@ -169,10 +171,10 @@ def addToFourteen(val1, val2, lo, hi):
 
 def switchMaps(app):
     trueYCoord = int(app.player.y//app.tileSize)
-    if trueYCoord == (16 - (app.nextBottom +1)):
-        print(app.nextBottom)
+    if trueYCoord < (15 - (app.nextBottom)):
         app.mapKey +=1
         createMap(app)
+        app.raycaster.castAllRays(app)
 
 def drawIntroAnimation(app):
     pass
@@ -191,7 +193,7 @@ def drawLoadingScreenOption(app, mainLabelKey):
     if mainLabelKey == 0:
         section = (app.width - 60)//4
         potentialLabels = ['Easy', 'Medium', 'Hard', 'Chaos']
-        potentialUrls = ['https://preview.redd.it/1l7j7jo5ys731.png?width=320&crop=smart&auto=webp&s=2ace6d0d0468a4defc925449619e33874b4e24f1','https://streak.club/img/Mix1c2VyX2NvbnRlbnQvdXBsb2Fkcy9pbWFnZS8zMjYxOC5wbmc=/original/cMTlu6.png']
+        potentialUrls=['https://streak.club/img/Mix1c2VyX2NvbnRlbnQvdXBsb2Fkcy9pbWFnZS8zMjYxOC5wbmc=/original/cMTlu6.png']
         #black hole image: https://streak.club/p/29287/black-hole-by-mentalpop
         #voyager image: https://www.reddit.com/r/PixelArt/comments/c83okd/voyager/
         #planet image: https://www.reddit.com/r/PixelArt/comments/16zw3mh/pixel_art_of_saturn_orginal_picture_from_nasa_on/
@@ -212,8 +214,10 @@ def drawLoadingScreenOption(app, mainLabelKey):
                       app.width/2, heightLevel + 340, bold = True, fill = 'white', size = 25)
             drawCircle(150, heightLevel + 340, 20, fill = 'red')
             drawCircle(150 + app.width-300, heightLevel + 340, 20, fill = 'green')
-        drawLabel('Press the green button to increase value\nPress the red button to decrease value\nPress enter to start game',
-                  app.width/2, 200, size = 25, bold = True, fill = 'white')
+        drawLabel('Press the green button to increase value',
+                  app.width/2, 200, size = 20, bold = True, fill = 'white')
+        drawLabel('Press the red button to decrease value', app.width/2, 225, size = 20, bold = True, fill = 'white')
+        drawLabel('Press enter to start the game', app.width/2, 250, size = 20, bold = True, fill = 'white')
 
 def loadingScreenButtonPress(app, mainLabelKey, mouseX, mouseY):
     if mainLabelKey == 0:

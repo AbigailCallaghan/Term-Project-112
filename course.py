@@ -87,8 +87,8 @@ class Course:
         #this is for curved up
         if mapOneCols < mapTwoCols:
             difference = mapTwoCols - mapOneCols
-           # if directionOne == 'straight':
-            #    difference += 1
+            if directionOne == 'curved up':
+                difference += 1
             
             beforeRow = colMapTwoWhiteSpace - colMapOneWhiteSpace
             afterRow = difference - beforeRow
@@ -96,9 +96,10 @@ class Course:
                 for i in range(difference):
                     mapOne[row].append(1)
         elif mapTwoCols < mapOneCols:
+            print('called')
             difference = mapOneCols - mapTwoCols
-           # if directionOne == 'straight':
-            #    difference += 1
+            if directionTwo == 'curved up':
+                difference += 1
             beforeRow = colMapOneWhiteSpace - colMapTwoWhiteSpace
             afterRow = difference - beforeRow
             for row in range(len(mapTwo)):
@@ -116,6 +117,7 @@ class Course:
         cols = len(self.map[0])
         rowDifference = 16 - rows
         colDifference = 16 - cols
+        app.nextBottom += rowDifference
         for row in range(rows):
             for i in range(colDifference):
                 self.map[row].append(1)

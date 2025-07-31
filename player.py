@@ -39,7 +39,7 @@ class Player:
         
         self.move(app)
         
-    
+    #I used AI to check that the physics was semi realistic after I wrote the code
     def buggyForces(self, app):
         if self.velocity >= 0:
             slope = app.potentialMaps[app.mapKey][3]
