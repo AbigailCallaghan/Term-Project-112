@@ -55,6 +55,10 @@ class Course:
             for row in range(len(self.map)):
                 for col in range(len(self.map[0])):
                     if self.map[row][col] == 0:
+                        row *= app.tileSize
+                        row += app.tileSize /2
+                        col *= app.tileSize
+                        col += app.tileSize /2
                         return row, col
         return 'all walls'
     
@@ -62,14 +66,14 @@ class Course:
         if direction == 'down':
             for row in range(len(map) -1, -1, -1):
                 for col in range(len(map[0])):
-                    if self.map[row][col] == 0:
+                    if map[row][col] == 0:
                         return row, col
         if direction == 'up':
             for row in range(len(map)):
                 for col in range(len(map[0])):
                     if map[row][col] == 0:
                         return row, col
-        return 'all walls'
+        return len(map)//2, len(map[0])//2
     
     def combineMaps(self, app, directionOne, lengthOne, widthOne, directionTwo, lengthTwo, widthTwo):
     
@@ -85,10 +89,11 @@ class Course:
             mapOne.append([1] * len(mapOne[0]))
 
         #this is for curved up
-        if mapOneCols < mapTwoCols:
+        if mapOneCols <= mapTwoCols:
             difference = mapTwoCols - mapOneCols
-            if directionOne == 'curved up':
-                difference += 1
+          #  if directionOne == 'curved up':
+             #   for row in range(len(mapOne)):
+             #       mapOne[row].append(1)
             
             beforeRow = colMapTwoWhiteSpace - colMapOneWhiteSpace
             afterRow = difference - beforeRow
@@ -96,10 +101,10 @@ class Course:
                 for i in range(difference):
                     mapOne[row].append(1)
         elif mapTwoCols < mapOneCols:
-            print('called')
             difference = mapOneCols - mapTwoCols
-            if directionTwo == 'curved up':
-                difference += 1
+            if directionOne == 'curved up' and widthOne <= widthTwo:
+                for row in range(len(mapOne)):
+                    mapOne[row].append(1)
             beforeRow = colMapOneWhiteSpace - colMapTwoWhiteSpace
             afterRow = difference - beforeRow
             for row in range(len(mapTwo)):

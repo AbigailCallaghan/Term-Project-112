@@ -17,7 +17,7 @@ class Player:
         self.walkDirection = 0
         self.velocity = 0
         self.inputForce = 0
-        self.rotationSpeed = 45 * (math.pi/180)
+        self.rotationSpeed = 90 * (math.pi/180)
         self.moving = False
         self.totalDistance = 0
         self.playerAngle = 45 * (math.pi / 180) + 180
@@ -28,14 +28,17 @@ class Player:
         drawLine(self.x, self.y, self.x + math.cos(self.playerAngle) *10 , self.y + math.sin(self.playerAngle) * 10, fill = 'red')
 
     def onKeyPress(self, app, key):
-        
-        if key == 'a':
-            self.turnDirection = -1
+        if key == 'a' and app.playerChars[3] == 'Keys':
+            self.turnDirection = -.25
             
-        if key == 'd':
-            self.turnDirection = 1
-        if key == 'space' and app.pushZone == True:
-            self.inputForce = 100
+        if key == 'd' and app.playerChars[3] == 'Keys':
+            self.turnDirection = .25
+        if key == 'space' and app.pushZone == True and app.coolDown == 0:
+            print('called')
+            self.inputForce += app.playerChars[2]
+            app.coolDown = app.maxCoolDown
+            print(app.coolDown)
+            app.maxCoolDown += 100
         
         self.move(app)
         
@@ -64,8 +67,11 @@ class Player:
         self.playerAngle += self.turnDirection * self.rotationSpeed
         if isWall == 0:
             if self.x >=0 and self.y >=0:
-                self.x += math.cos(self.playerAngle) * self.velocity
-                self.y += math.sin(self.playerAngle) * self.velocity
+                dx = math.cos(self.playerAngle) * self.velocity
+                dy = math.sin(self.playerAngle) * self.velocity
+                self.x += dx
+                self.y += dy
+                self.totalDistance += (dx ** 2 + dy **2) **.5
             
    
 
@@ -84,6 +90,7 @@ class Player:
                 self.turnDirection -= (1/distanceBetweenLeft) * self.rotationSpeed
             else:
                 self.turnDirection += (1/distanceBetweenRight) * self.rotationSpeed
+            
             self.move(app)
 
     def whileKeysPressed(self):
